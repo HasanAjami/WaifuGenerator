@@ -4,6 +4,10 @@ import time
 import os
 
 
+api_key = "6bbb92eb-ab95-4e68-9d35-ffb6348439ae"
+model = "anything-v4.5-pruned.ckpt [65745d25]"
+#models: (realistic) "deliberate_v2.safetensors [10ec4b29]", (stable Diffusion) "anything-v4.5-pruned.ckpt [65745d25]"
+
 def get_job_code(response_text):
     response_dict = json.loads(response_text)
     job_code = response_dict["job"]
@@ -13,8 +17,7 @@ def job_creator(prompt, neg_prompt):
     
     url = "https://api.prodia.com/v1/job"
     payload = {
-        #"model": "deliberate_v2.safetensors [10ec4b29]",
-        "model": "anything-v4.5-pruned.ckpt [65745d25]",
+        "model": model,
         "prompt": prompt,
         "negative_prompt": neg_prompt, 
         "steps": 30,
@@ -28,7 +31,7 @@ def job_creator(prompt, neg_prompt):
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
-        "X-Prodia-Key": "6bbb92eb-ab95-4e68-9d35-ffb6348439ae"
+        "X-Prodia-Key": api_key
     }
 
     # Send the request to create the job and retrieve the job code
@@ -76,6 +79,8 @@ with open("D:\\Python Projects\\WaifuGenerator\\neg_prompts.txt", "r") as f:
 
 # Generate and save images for each prompt
 for prompt in prompts:
+    if(prompt == "end"):
+        break
     for i in range(4):
         url = job_creator(prompt, neg_prompt)
         save_image(url)
