@@ -1,0 +1,2 @@
+# WaifuGenerator
+ Generate WAIFUS
