@@ -6,7 +6,7 @@ import os
 
 api_key = "6bbb92eb-ab95-4e68-9d35-ffb6348439ae"
 model = "anything-v4.5-pruned.ckpt [65745d25]"
-#models: (realistic) "deliberate_v2.safetensors [10ec4b29]", (stable Diffusion) "anything-v4.5-pruned.ckpt [65745d25]"
+#models: (realistic) "deliberate_v2.safetensors [10ec4b29]", (stable Diffusion) "anything-v4.5-pruned.ckpt [65745d25]", (anime) "model": "meinamix_meinaV9.safetensors [2ec66ab0]"
 
 my_path = "D:/Python Projects/WaifuGenerator/output"
 
@@ -86,6 +86,6 @@ with open("D:\\Python Projects\\WaifuGenerator\\neg_prompts.txt", "r") as f:
 for prompt in prompts:
     if(prompt == "end"):
         break
-    for i in range(4):          #Amount of pictures from each prompt
+    for i in range(1):          #Amount of pictures from each prompt
         url = job_creator(prompt, neg_prompt)
         save_image(url)
