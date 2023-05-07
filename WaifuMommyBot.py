@@ -6,6 +6,37 @@ import random
 import discord
 from discord.ext import commands
 
+last_saved_prompt = "x"
+last_saved_model = "x"
+
+prompt_src = ["D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Background.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Body.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\BreastsToModify.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\ClothesToModify.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Expression.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\EyesToModify.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Hair.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\HairColorToModify.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\HairLengthToModify.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\HairStuff1.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Hands.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Head.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Legs.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Legwear2.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\MouthToModify.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Other.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Panties.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Posture1.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Posture2.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Sleeves.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\StyleOfHair.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\UpperBody1.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\UpperBody2.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\UpperBody3.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\UpperBody4.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\UpperBody5.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\UpperBody6.txt",
+              "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\UpperBody7.txt"]
 
 elyas_jokes = [
     "Why did Elyas bring a ladder to the party? He heard the drinks were on the house!",
@@ -52,22 +83,61 @@ intents.presences = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.command()
+async def commands(ctx):
+    await ctx.send("Hi! I am Hasan's Waifu, I'm the mommy of his creations! \n You can use me to generate waifus and do other stuff, here are my commands: \n !newWaifu to generate a Waifu, I will then ask for a model (choose number), you then type the prompt or random for a random prompt! \n !saveImage to save in generations_showcase \n !redo to redo the previous prompt, if the Waifu looked like shit \n !tellElyasJoke to tell Elyas a stupid joke! \n happy to hear from you :D")
+
+@bot.command()
 async def hello(ctx):
-    await ctx.send('Hello!')
+    await ctx.send(f'Hello! {ctx.author}')
 
 @bot.command()
 async def bye(ctx):
     await ctx.send('Finally! Get some bitches! byeeeee...')
 
+def random_prompt_gen():
+    output_prompt = ""
+    for file_path in prompt_src:
+        with open(file_path, "r") as file:
+            lines = file.readlines()
+            random_line = random.choice(lines)
+            element = random_line.strip().lstrip("- ") # remove leading hyphen and any spaces after it
+            output_prompt += element + ", "
+    return output_prompt.rstrip(", ")
+
+@bot.command()
+async def random_prompt(ctx):
+    rand_res =  random_prompt_gen()
+
+    await ctx.send("Your random prompt: " + rand_res)
 
 @bot.command()
 async def tellElyasJoke(ctx):
     edgy_member = discord.utils.get(ctx.guild.members, name='EdgyGamer')
     await ctx.send(f"Hey {edgy_member.mention} here is a joke: " + elyas_jokes[random.randint(0, len(elyas_jokes))])
+
+@bot.command()
+async def saveImage(ctx, message_id: int):
+    message = await ctx.fetch_message(message_id)
+    image_url = None
+
+    for attachment in message.attachments:
+        if attachment.width:
+            image_url = attachment.url
+            break
+    
+    if not image_url:
+        await ctx.send("No image found in the specified message.")
+        return
+
+    channel = bot.get_channel(1099661736224751657) # replace with the destination channel ID
+    await channel.send(image_url)
+
 #------------------------------------------------------------------------------------------------------------------
 
 api_key = "6bbb92eb-ab95-4e68-9d35-ffb6348439ae"
 model = "meinamix_meinaV9.safetensors [2ec66ab0]"
+
+
 
 
 def get_job_code(response_text):
@@ -118,12 +188,11 @@ def job_creator(prompt, neg_prompt, job_model):
         else:
             time.sleep(5) # wait for 5 seconds before checking again
 
-
 @bot.command()
 async def newWaifu(ctx):
     # Send a message to the channel asking for a prompt
    # get user's prompt
-    await ctx.send("Which model do you want to use? please choose from: \n 1: delibrate \n 2: meina \n 3: anything")
+    await ctx.send("Which model do you want to use? please choose from: \n 1: delibrate \n 2: meina \n 3: anything \n 4: eldreth")
     prompt = await bot.wait_for('message', check= lambda m: m.author == ctx.author)
     prompt = prompt.content
     my_model = "meinamix_meinaV9.safetensors [2ec66ab0]"
@@ -137,6 +206,9 @@ async def newWaifu(ctx):
         case "3":
             my_model = "anything-v4.5-pruned.ckpt [65745d25]"
             await ctx.send("Ok changed to anything v4.5")
+        case "4":
+            my_model = "elldreths-vivid-mix.safetensors [342d9d26]"
+            await ctx.send("Ok changed to eldreth")
         case default:
             await ctx.send("That was not a valid model, will use meina")
 
@@ -144,7 +216,16 @@ async def newWaifu(ctx):
     await ctx.send("What do you want your waifu to look like?")
     prompt = await bot.wait_for('message', check=lambda m: m.author == ctx.author)
     prompt = prompt.content
+
+    if(prompt == "random"):
+        prompt = random_prompt_gen()
+        await ctx.send("Ok, will gen a Waifu for you with the random prompt: " + prompt)
+
     
+    global last_saved_prompt
+    global last_saved_model
+    last_saved_model = my_model
+    last_saved_prompt = prompt
     # generate the image using the prompt
     url = job_creator(prompt, "bad anatomy, inaccurate eyes, bad quality", my_model)
     
@@ -156,6 +237,27 @@ async def newWaifu(ctx):
     # send the image to the channel
     with open('generated_image.png', 'rb') as f:
         await ctx.send(file=discord.File(f, 'generated_image.png'))
+
+
+@bot.command()
+async def redo(ctx, additional = " "):
+    if(last_saved_prompt != "x" and last_saved_model != "x"):
+        
+        await ctx.send("I will redo: " + last_saved_prompt + ", " + additional)
+        
+        url = job_creator(last_saved_prompt  + ", " + additional, "bad anatomy, inaccurate eyes, bad quality", last_saved_model)
+    
+    # download the image and save it as a file
+        response = requests.get(url)
+        with open('generated_image.png', 'wb') as f:
+            f.write(response.content)
+    
+    # send the image to the channel
+        with open('generated_image.png', 'rb') as f:
+            await ctx.send(file=discord.File(f, 'generated_image.png'))
+
+    else:
+        await ctx.send("Sorry, I wasn't called before! Please use !newWaifu")
 
 
 
