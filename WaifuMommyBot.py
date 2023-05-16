@@ -5,9 +5,11 @@ import os
 import random
 import discord
 from discord.ext import commands
+import sys
 
 last_saved_prompt = "x"
 last_saved_model = "x"
+saved_image_name = 'generated_image.png'
 
 prompt_src = ["D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Background.txt",
               "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Body.txt",
@@ -70,10 +72,7 @@ elyas_jokes = [
     "How does Elyas like his pizza? With extra cheese, and a lot of saucy puns on the side!",
     "What did Elyas say when he got lost in the woods? \"I am stumped!\" "]
 
-
-
-
-
+#Discord intents
 intents = discord.Intents.all()
 intents.members = True
 intents.messages = True
@@ -81,7 +80,7 @@ intents.typing = True
 intents.presences = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
-
+#shows a list of commands
 @bot.command()
 async def commands(ctx):
     await ctx.send("Hi! I am Hasan's Waifu, I'm the mommy of his creations! \n You can use me to generate waifus and do other stuff, here are my commands: \n !newWaifu to generate a Waifu, I will then ask for a model (choose number), you then type the prompt or random for a random prompt! \n !saveImage to save in generations_showcase \n !redo to redo the previous prompt, if the Waifu looked like shit \n !tellElyasJoke to tell Elyas a stupid joke! \n happy to hear from you :D")
@@ -93,22 +92,13 @@ async def hello(ctx):
 @bot.command()
 async def bye(ctx):
     await ctx.send('Finally! Get some bitches! byeeeee...')
-
-def random_prompt_gen():
-    output_prompt = ""
-    for file_path in prompt_src:
-        with open(file_path, "r") as file:
-            lines = file.readlines()
-            random_line = random.choice(lines)
-            element = random_line.strip().lstrip("- ") # remove leading hyphen and any spaces after it
-            output_prompt += element + ", "
-    return output_prompt.rstrip(", ")
-
+#shuts the bot down
 @bot.command()
-async def random_prompt(ctx):
-    rand_res =  random_prompt_gen()
+async def killYourSelf(ctx):
+    await ctx.send("OK I go die")
+    sys.exit()
 
-    await ctx.send("Your random prompt: " + rand_res)
+
 
 @bot.command()
 async def tellElyasJoke(ctx):
@@ -133,30 +123,32 @@ async def saveImage(ctx, message_id: int):
     await channel.send(image_url)
 
 #------------------------------------------------------------------------------------------------------------------
-
+#'Prodia API'
 api_key = "6bbb92eb-ab95-4e68-9d35-ffb6348439ae"
 model = "meinamix_meinaV9.safetensors [2ec66ab0]"
 
 
 
-
+#Prodia AI GET and POST:
+#GET
 def get_job_code(response_text):
     response_dict = json.loads(response_text)
     job_code = response_dict["job"]
     return job_code
-
+#POST
 def job_creator(prompt, neg_prompt, job_model): 
+
     
     url = "https://api.prodia.com/v1/job"
     payload = {
         "model": job_model,
         "prompt": prompt,
         "negative_prompt": neg_prompt, 
-        "steps": 30,
-        "cfg_scale": 7,
+        "steps": 40,
+        "cfg_scale": 8,
         "seed": -1,
         "upscale": True,
-        "sampler": "DPM++ 2M Karras",
+        "sampler": "Euler a", #Euler a, DPM++ 2M Karras
         "aspect_ratio": "square"
     }
 
@@ -187,9 +179,33 @@ def job_creator(prompt, neg_prompt, job_model):
             return "none"
         else:
             time.sleep(5) # wait for 5 seconds before checking again
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Waifu Generating commands
+
+def random_prompt_gen():
+    output_prompt = ""
+    for file_path in prompt_src:
+        with open(file_path, "r") as file:
+            lines = file.readlines()
+            random_line = random.choice(lines)
+            element = random_line.strip().lstrip("- ") # remove leading hyphen and any spaces after it
+            output_prompt += element + ", "
+    return output_prompt.rstrip(", ")
 
 @bot.command()
-async def newWaifu(ctx):
+async def random_prompt(ctx):
+    rand_res =  random_prompt_gen()
+
+    await ctx.send("Your random prompt: " + rand_res)
+
+@bot.command()
+async def newWaifu(ctx, amount = 0):
+    amount = int(amount)
+    if(amount > 0): amount -= 1
+    
+    change_random = False
+    job_author = ctx.author
+    mention = job_author.mention
     # Send a message to the channel asking for a prompt
    # get user's prompt
     await ctx.send("Which model do you want to use? please choose from: \n 1: delibrate \n 2: meina \n 3: anything \n 4: eldreth")
@@ -218,25 +234,34 @@ async def newWaifu(ctx):
     prompt = prompt.content
 
     if(prompt == "random"):
-        prompt = random_prompt_gen()
-        await ctx.send("Ok, will gen a Waifu for you with the random prompt: " + prompt)
+        change_random = True
+        
 
+
+    while(amount >= 0):
+        if(change_random == True):
+            prompt = random_prompt_gen()
+            await ctx.send("Next job prompt is: " + prompt)
+        await ctx.send(f"Generating... {amount} job(s) left")
+        global last_saved_prompt
+        global last_saved_model
+        last_saved_model = my_model
+        last_saved_prompt = prompt
+        # generate the image using the prompt
+        url = job_creator(prompt, "bad anatomy, inaccurate eyes, bad quality", my_model)
     
-    global last_saved_prompt
-    global last_saved_model
-    last_saved_model = my_model
-    last_saved_prompt = prompt
-    # generate the image using the prompt
-    url = job_creator(prompt, "bad anatomy, inaccurate eyes, bad quality", my_model)
+        # download the image and save it as a file
+        response = requests.get(url)
+        with open(saved_image_name, 'wb') as f:
+            f.write(response.content)
+        
+        # send the image to the channel
+        with open(saved_image_name, 'rb') as f:
+            await ctx.send(file=discord.File(f, saved_image_name))
+        amount -= 1
     
-    # download the image and save it as a file
-    response = requests.get(url)
-    with open('generated_image.png', 'wb') as f:
-        f.write(response.content)
-    
-    # send the image to the channel
-    with open('generated_image.png', 'rb') as f:
-        await ctx.send(file=discord.File(f, 'generated_image.png'))
+    await ctx.send(f"Alright, no jobs left! Remember to say thank you {mention} >:3 ")
+
 
 
 @bot.command()
@@ -249,12 +274,12 @@ async def redo(ctx, additional = " "):
     
     # download the image and save it as a file
         response = requests.get(url)
-        with open('generated_image.png', 'wb') as f:
+        with open(saved_image_name, 'wb') as f:
             f.write(response.content)
     
     # send the image to the channel
-        with open('generated_image.png', 'rb') as f:
-            await ctx.send(file=discord.File(f, 'generated_image.png'))
+        with open(saved_image_name, 'rb') as f:
+            await ctx.send(file=discord.File(f, saved_image_name))
 
     else:
         await ctx.send("Sorry, I wasn't called before! Please use !newWaifu")
