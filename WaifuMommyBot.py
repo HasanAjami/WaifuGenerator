@@ -105,22 +105,7 @@ async def tellElyasJoke(ctx):
     edgy_member = discord.utils.get(ctx.guild.members, name='EdgyGamer')
     await ctx.send(f"Hey {edgy_member.mention} here is a joke: " + elyas_jokes[random.randint(0, len(elyas_jokes))])
 
-@bot.command()
-async def saveImage(ctx, message_id: int):
-    message = await ctx.fetch_message(message_id)
-    image_url = None
 
-    for attachment in message.attachments:
-        if attachment.width:
-            image_url = attachment.url
-            break
-    
-    if not image_url:
-        await ctx.send("No image found in the specified message.")
-        return
-
-    channel = bot.get_channel(1099661736224751657) # replace with the destination channel ID
-    await channel.send(image_url)
 
 #------------------------------------------------------------------------------------------------------------------
 #'Prodia API'
@@ -262,7 +247,24 @@ async def newWaifu(ctx, amount = 0):
     
     await ctx.send(f"Alright, no jobs left! Remember to say thank you {mention} >:3 ")
 
+@bot.command()
+async def saveImage(ctx,  *, message_id: str):
+    message_id = [int(num.strip()) for num in message_id.split(',')]
+    for my_id in message_id:
+        message = await ctx.fetch_message(my_id)
+        image_url = None
+        
+        for attachment in message.attachments:
+            if attachment.width:
+                image_url = attachment.url
+                break
+        
+        if not image_url:
+            await ctx.send("No image found in the specified message.")
+            return
 
+        channel = bot.get_channel(1099661736224751657) # replace with the destination channel ID
+        await channel.send(image_url)
 
 @bot.command()
 async def redo(ctx, additional = " "):
