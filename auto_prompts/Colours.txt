@@ -1,0 +1,100 @@
+Red
+Green
+Blue
+Yellow
+Orange
+Purple
+Pink
+Brown
+Black
+White
+Gray
+Cyan
+Magenta
+Teal
+Navy
+Maroon
+Indigo
+Turquoise
+Gold
+Silver
+Ivory
+Beige
+Coral
+Salmon
+Lavender
+Peach
+Mint
+Lilac
+Olive
+Plum
+Ruby
+Sapphire
+Emerald
+Amber
+Turquoise
+Mustard
+Sky Blue
+Orchid
+Periwinkle
+Cinnamon
+Chartreuse
+Mauve
+Mahogany
+Fuchsia
+Aquamarine
+Apricot
+Cobalt
+Bronze
+Brick
+Celadon
+Champagne
+Chestnut
+Cornflower
+Cranberry
+Denim
+Eggplant
+Forest Green
+Ginger
+Granite
+Heather
+Jade
+Khaki
+Lemon
+Lapis Lazuli
+Lilac
+Lime
+Marigold
+Moss
+Mulberry
+Ochre
+Olive
+Peacock Blue
+Pearl
+Puce
+Raspberry
+Rust
+Sand
+Seafoam
+Sienna
+Slate
+Smoke
+Steel Blue
+Tangerine
+Thistle
+Topaz
+Vermilion
+Violet
+Wheat
+Wine
+Zaffre
+Blush
+Cyan
+Celosia Orange
+Viridian
+Carrot
+Ruby Red
+Turquoise Blue
+Lemon Yellow
+Persian Green
+Electric Indigo

@@ -7,3 +7,4 @@ grey background
 Bedroom
 Library
 sunset
+color
