@@ -193,7 +193,7 @@ async def newWaifu(ctx, amount = 0):
     mention = job_author.mention
     # Send a message to the channel asking for a prompt
    # get user's prompt
-    await ctx.send("Which model do you want to use? please choose from: \n 1: delibrate \n 2: meina \n 3: anything \n 4: eldreth")
+    await ctx.send("Which model do you want to use? please choose from: \n 1: delibrate \n 2: meina \n 3: anything \n 4: realistic")
     prompt = await bot.wait_for('message', check= lambda m: m.author == ctx.author)
     prompt = prompt.content
     my_model = "meinamix_meinaV9.safetensors [2ec66ab0]"
@@ -205,11 +205,11 @@ async def newWaifu(ctx, amount = 0):
             my_model = "meinamix_meinaV9.safetensors [2ec66ab0]"
             await ctx.send("Ok changed to meinaMix")
         case "3":
-            my_model = "anything-v4.5-pruned.ckpt [65745d25]"
-            await ctx.send("Ok changed to anything v4.5")
+            my_model = "anythingV5_PrtRE.safetensors [893e49b9]"
+            await ctx.send("Ok changed to anything v5")
         case "4":
-            my_model = "elldreths-vivid-mix.safetensors [342d9d26]"
-            await ctx.send("Ok changed to eldreth")
+            my_model = "shoninsBeautiful_v10.safetensors [25d8c546]"
+            await ctx.send("Ok changed to shonin (realistic)")
         case default:
             await ctx.send("That was not a valid model, will use meina")
 
@@ -220,6 +220,8 @@ async def newWaifu(ctx, amount = 0):
 
     if(prompt == "random"):
         change_random = True
+    elif(prompt == "stop" or prompt == "cancle" or prompt == "exit"):
+        return
         
 
 
