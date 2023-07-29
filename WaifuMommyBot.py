@@ -5,6 +5,7 @@ import os
 import random
 import discord
 from discord.ext import commands
+
 import sys
 
 last_saved_prompt = "x"
@@ -40,37 +41,8 @@ prompt_src = ["D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Background.txt
               "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\UpperBody6.txt",
               "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\UpperBody7.txt"]
 
-elyas_jokes = [
-    "Why did Elyas bring a ladder to the party? He heard the drinks were on the house!",
-    "What did Elyas say when he found a job as a professional window washer? 'I'm finally seeing things clearly!'",
-    "Why did Elyas take up yoga? To find his inner peace and quiet his mind, but mostly because he wanted to touch his toes without feeling winded.",
-    "Why did Elyas quit his job at the orange juice factory? He just couldn't concentrate!",
-    "What do you get when you cross Elyas and a couch? A lounge lizard!",
-    "How does Elyas keep his feet warm in the winter? By wearing toe-sts!",
-    "What do you call Elyas when he's running late? Delayed, but not defeated!",
-    "Why did Elyas go to the bank wearing a mask? He wanted to make a face deposit!",
-    "What did Elyas say when he won the marathon? 'I'm running on adrenaline, and also because I don't know where the finish line is!'",
-    "How does Elyas like his eggs? With a side of jokes!",
-    "Why did Elyas go to the dentist? To get a Bluetooth!",
-    "Why did Elyas bring his piano to the beach? He wanted to play some beach-tunes!",
-    "What did Elyas say when he got a ticket for speeding? 'I was just trying to get to the punchline faster!'",
-    "How does Elyas get his exercise? By running from his problems!",
-    "Why did Elyas take a job at the calendar factory? He heard they needed someone who could work months on end!",
-    "What do you get when you cross Elyas with a snowman? Frostbite!",
-    "Why did Elyas buy a boat? He wanted to sail into the sunset and see what's on the horizon!",
-    "What did Elyas say when he went to the barbershop? 'Just a little off the top, and a lot off the sides!'",
-    "How does Elyas like his coffee? Strong enough to wake the dead!",
-    "Why did Elyas wear a sweater to the zoo? He heard the lion had a mane attraction!",
-    "What did Elyas say when he got a new job as a historian? 'I'm looking forward to making history, and then reading about it later!'",
-    "How does Elyas stay cool in the summer? By keeping his fans close and his jokes even closer!",
-    "Why did Elyas become a comedian? Because he didn't get the memo that puns were bad!",
-    "What did Elyas say when he saw a mirror for the first time? 'I look exactly like my reflection!'",
-    "How does Elyas like his steak cooked? With a side of medium-rare humor!",
-    "Why did Elyas go to the library? He wanted to check out some books and check-in with his literary side!",
-    "What did Elyas say when he found a genie in a bottle? 'I wish I had more wishes, but I don't want to be greedy... so I'll take two!'",
-    "Why did Elyas bring a parachute to the party? He wanted to make a grand entrance!",
-    "How does Elyas like his pizza? With extra cheese, and a lot of saucy puns on the side!",
-    "What did Elyas say when he got lost in the woods? \"I am stumped!\" "]
+prompt_clothes_src = "D:\\Python Projects\\WaifuGenerator\\auto_prompts\\Clothes"
+
 
 #Discord intents
 intents = discord.Intents.all()
@@ -98,12 +70,10 @@ async def killYourSelf(ctx):
     await ctx.send("OK I go die")
     sys.exit()
 
-
-
 @bot.command()
-async def tellElyasJoke(ctx):
-    edgy_member = discord.utils.get(ctx.guild.members, name='EdgyGamer')
-    await ctx.send(f"Hey {edgy_member.mention} here is a joke: " + elyas_jokes[random.randint(0, len(elyas_jokes))])
+async def thank_you(ctx):
+    await ctx.send("No problem! Always happy to help")
+    sys.exit()
 
 
 
@@ -167,6 +137,40 @@ def job_creator(prompt, neg_prompt, job_model):
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #Waifu Generating commands
 
+def get_random_text_from_clothes_folder():
+    clothes_folder_path = prompt_clothes_src  # Replace this with the path to your "clothes" folder
+
+    # Get a list of all folders inside the "clothes" folder
+    subfolders = [f.name for f in os.scandir(clothes_folder_path) if f.is_dir()]
+
+    if not subfolders:
+        print("No folders found inside 'clothes' folder.")
+        return None
+
+    # Select a random folder from the list
+    selected_folder = random.choice(subfolders)
+
+    folder_path = os.path.join(clothes_folder_path, selected_folder)
+
+    # Get a list of all text files inside the selected folder
+    text_files = [f.name for f in os.scandir(folder_path) if f.is_file() and f.name.endswith(".txt")]
+
+    if not text_files:
+        print(f"No text files found inside '{selected_folder}' folder.")
+        return None
+
+    # Select a random text file from the list
+    selected_textfile = random.choice(text_files)
+
+    textfile_path = os.path.join(folder_path, selected_textfile)
+
+    # Read the text inside the selected text file
+    with open(textfile_path, "r") as file:
+        text_content = file.read()
+
+    return text_content
+
+
 def random_prompt_gen():
     output_prompt = ""
     for file_path in prompt_src:
@@ -205,7 +209,7 @@ async def newWaifu(ctx, amount = 0):
             my_model = "meinamix_meinaV9.safetensors [2ec66ab0]"
             await ctx.send("Ok changed to meinaMix")
         case "3":
-            my_model = "anythingV5_PrtRE.safetensors [893e49b9]"
+            my_model = "anything-v4.5-pruned.ckpt [65745d25]"
             await ctx.send("Ok changed to anything v5")
         case "4":
             my_model = "shoninsBeautiful_v10.safetensors [25d8c546]"
@@ -227,7 +231,7 @@ async def newWaifu(ctx, amount = 0):
 
     while(amount >= 0):
         if(change_random == True):
-            prompt = random_prompt_gen()
+            prompt = random_prompt_gen() + ", " + get_random_text_from_clothes_folder()
             await ctx.send("Next job prompt is: " + prompt)
         await ctx.send(f"Generating... {amount} job(s) left")
         global last_saved_prompt
@@ -288,6 +292,19 @@ async def redo(ctx, additional = " "):
     else:
         await ctx.send("Sorry, I wasn't called before! Please use !newWaifu")
 
+IMAGE_SAVE_PATH = r"D:\Apps\Unity\My project\Assets\CardPrefab\StatsSource\Waifus"
+
+
+def get_last_saved_number():
+    files = os.listdir(IMAGE_SAVE_PATH)
+    if not files:
+        return 0
+
+    numbers = [int(filename.split('.')[0]) for filename in files if filename.isdigit()]
+    if not numbers:
+        return 0
+
+    return max(numbers)
 
 
 
